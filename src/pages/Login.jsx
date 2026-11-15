@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import apiClient from '../api/client'; // Подключаем API-клиент
+import apiClient, { setAccessToken } from '../api/client'; // Подключаем API-клиент
 
 export default function Login() {
     const [isRegister, setIsRegister] = useState(false);
@@ -28,6 +28,7 @@ export default function Login() {
                 const response = await apiClient.post('/Users/login', {
                     email, password
                 });
+                setAccessToken(response.data.accessToken);
                 setMessage(`Успех: ${response.data.message}!`);
                 // Позже здесь мы сохраним токен и перейдем на главную страницу
             }
