@@ -1,135 +1,67 @@
 import { useState } from 'react';
-import apiClient, { setAccessToken } from '../api/client'; // Подключаем API-клиент
+import apiClient, { setAccessToken } from '../api/client';
 
-export default function Login() {
-    const [isRegister, setIsRegister] = useState(false);
+export default function Login({ onAuthenticated }) {
+  const [isRegister, setIsRegister] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Owner');
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-    // Состояния для полей ввода
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('Owner');
-    const [message, setMessage] = useState(''); // Для вывода сообщений
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setMessage('');
+    setIsLoading(true);
+    try {
+      if (isRegister) {
+        const response = await apiClient.post('/Users/register', { name, email, password, role });
+        setMessage(response.data.message || 'Аккаунт создан. Теперь можно войти.');
+        setIsRegister(false);
+      } else {
+        const response = await apiClient.post('/Users/login', { email, password });
+        setAccessToken(response.data.accessToken);
+        onAuthenticated?.(response.data.user);
+      }
+    } catch (error) {
+      const serverMessage = error.response?.data;
+      setMessage(typeof serverMessage === 'string' ? serverMessage : 'Не удалось связаться с сервером. Попробуйте ещё раз.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault(); // Чтобы страница не перезагружалась
-        setMessage(''); // Очищаем прошлые сообщения
-
-        try {
-            if (isRegister) {
-                // Отправка на регистрацию
-                const response = await apiClient.post('/Users/register', {
-                    name, email, password, role
-                });
-                setMessage(`Успех: ${response.data.message}! Теперь можете войти.`);
-                setIsRegister(false); // Переключаем на форму входа
-            } else {
-                // Отправка на вход
-                const response = await apiClient.post('/Users/login', {
-                    email, password
-                });
-                setAccessToken(response.data.accessToken);
-                setMessage(`Успех: ${response.data.message}!`);
-                // Позже здесь мы сохраним токен и перейдем на главную страницу
-            }
-        } catch (error) {
-            // Обработка ошибок от сервера
-            if (error.response && error.response.data) {
-                setMessage(`Ошибка: ${error.response.data}`);
-            } else {
-                setMessage('Ошибка: Сервер недоступен. Проверьте, запущен ли C# проект.');
-            }
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-
-                <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-                    {isRegister ? 'Регистрация' : 'Вход в DogWalking'}
-                </h2>
-
-                {/* Блок для вывода сообщений об ошибках или успехе */}
-                {message && (
-                    <div className={`p-4 mb-4 rounded-lg text-sm ${message.includes('Ошибка') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                        {message}
-                    </div>
-                )}
-
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                    {isRegister && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Имя</label>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Ваше имя"
-                            />
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="you@example.com"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Пароль</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="••••••••"
-                        />
-                    </div>
-
-                    {isRegister && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Роль</label>
-                            <select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="Owner">Я хозяин собаки</option>
-                                <option value="Walker">Я выгульщик</option>
-                            </select>
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                        {isRegister ? 'Зарегистрироваться' : 'Войти'}
-                    </button>
-                </form>
-
-                <div className="mt-6 text-center">
-                    <button
-                        onClick={() => {
-                            setIsRegister(!isRegister);
-                            setMessage('');
-                        }}
-                        className="text-sm text-blue-600 hover:text-blue-500"
-                    >
-                        {isRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
-                    </button>
-                </div>
-            </div>
+  return (
+    <main className="auth-page">
+      <section className="auth-story">
+        <a className="auth-brand" href="#home"><span className="auth-brand-mark">🐾</span><span>dogwalking</span></a>
+        <div className="auth-story-content">
+          <p className="auth-kicker">ЗАБОТА РЯДОМ</p>
+          <h1>Хорошая прогулка<br />начинается с доверия.</h1>
+          <p>Находите заботливых исполнителей для выгула и передержки. Всё важное о заказе — в одном месте.</p>
+          <div className="auth-trust"><span>✓</span><div><strong>Ваши данные под защитой</strong><small>Безопасный вход и личные профили</small></div></div>
         </div>
-    );
+        <div className="auth-decoration"><span>🐕</span><i /><i /><i /></div>
+        <small className="auth-footer">© DogWalking · Сервис заботы о питомцах</small>
+      </section>
+      <section className="auth-panel">
+        <div className="auth-form-wrap">
+          <p className="auth-kicker">{isRegister ? 'СОЗДАТЬ АККАУНТ' : 'С ВОЗВРАЩЕНИЕМ'}</p>
+          <h2>{isRegister ? 'Присоединяйтесь' : 'Войти в аккаунт'}</h2>
+          <p className="auth-intro">{isRegister ? 'Создайте защищённый профиль, чтобы начать.' : 'Введите данные, чтобы продолжить.'}</p>
+          {message && <div className={`auth-message ${/не удалось|ошибка|неверный|уже существует/i.test(message) ? 'error' : ''}`} role="status">{message}</div>}
+          <form onSubmit={handleSubmit} className="auth-form">
+            {isRegister && <label>Ваше имя<input type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" placeholder="Например, Анна" required /></label>}
+            <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" placeholder="you@example.com" required /></label>
+            <label>Пароль<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={isRegister ? 'new-password' : 'current-password'} minLength={isRegister ? 8 : undefined} placeholder={isRegister ? 'Не менее 8 символов' : 'Введите пароль'} required /></label>
+            {isRegister && <label>Как вы будете пользоваться сервисом?<select value={role} onChange={(event) => setRole(event.target.value)}><option value="Owner">Я владелец собаки</option><option value="Walker">Я исполнитель</option></select></label>}
+            <button className="auth-submit" type="submit" disabled={isLoading}>{isLoading ? 'Подождите…' : isRegister ? 'Создать аккаунт' : 'Войти'}<span>→</span></button>
+          </form>
+          <div className="auth-switch">{isRegister ? 'Уже есть аккаунт?' : 'Впервые здесь?'} <button onClick={() => { setIsRegister(!isRegister); setMessage(''); }}>{isRegister ? 'Войти' : 'Создать аккаунт'}</button></div>
+          <p className="auth-legal">Продолжая, вы соглашаетесь с правилами сервиса и политикой конфиденциальности.</p>
+        </div>
+      </section>
+    </main>
+  );
 }
