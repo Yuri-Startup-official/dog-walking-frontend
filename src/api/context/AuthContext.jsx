@@ -1,11 +1,17 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = localStorage.getItem('user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      return null;
+    }
   });
 
   const login = useCallback((userData, token) => {
@@ -20,6 +26,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  useEffect(() => {
+    const handleExpired = () => setUser(null);
+    window.addEventListener('auth:expired', handleExpired);
+    return () => window.removeEventListener('auth:expired', handleExpired);
+  }, []);
+
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
       {children}
@@ -27,6 +39,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');

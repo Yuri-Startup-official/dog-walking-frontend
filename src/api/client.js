@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:5000/api', // ЗАМЕНИ на реальный адрес апишки
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5199/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -24,6 +24,7 @@ apiClient.interceptors.response.use(
             // Токен протух или неверный — удаляем его
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user');
+            window.dispatchEvent(new Event('auth:expired'));
         }
         return Promise.reject(error);
     }

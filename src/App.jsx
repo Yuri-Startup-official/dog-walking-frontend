@@ -1,49 +1,51 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { useAuth } from './api/context/AuthContext';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import OwnerDashboard from './pages/OwnerDashboard';
 import WalkerDashboard from './pages/WalkerDashboard';
-import { useAuth } from './context/AuthContext';
 
-function RequireAuth({ children, role }) {
-  const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (role && user?.role !== role) return <Navigate to="/" replace />;
+function normalizedRole(role) {
+  const value = String(role || '').toLowerCase();
+  if (value === 'walker') return 'sitter';
+  return value;
+}
+
+function RequireAuth({ children, allowedRoles }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (!allowedRoles.includes(normalizedRole(user.role))) return <Navigate to="/" replace />;
   return children;
 }
 
 export default function App() {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
+  const role = normalizedRole(user?.role);
 
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
+      <Route path="/register" element={<Login initialMode="register" />} />
       <Route
         path="/owner"
-        element={
-          <RequireAuth role="Owner">
+        element={(
+          <RequireAuth allowedRoles={['owner', 'both']}>
             <OwnerDashboard />
           </RequireAuth>
-        }
+        )}
       />
       <Route
         path="/walker"
-        element={
-          <RequireAuth role="Walker">
+        element={(
+          <RequireAuth allowedRoles={['sitter', 'both']}>
             <WalkerDashboard />
           </RequireAuth>
-        }
+        )}
       />
-
       <Route
         path="/"
-        element={
-          isAuthenticated
-            ? <Navigate to={user.role === 'Owner' ? '/owner' : '/walker'} replace />
-            : <Navigate to="/login" replace />
-        }
+        element={user
+          ? <Navigate to={role === 'sitter' ? '/walker' : '/owner'} replace />
+          : <Navigate to="/login" replace />}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
