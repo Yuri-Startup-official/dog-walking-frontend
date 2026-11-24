@@ -14,10 +14,23 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-    if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = accessToken || localStorage.getItem('accessToken');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            accessToken = null;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+        }
+        return Promise.reject(error);
+    }
+);
 
 export default apiClient;
