@@ -28,7 +28,7 @@ export default function Login({ initialMode = 'login' }) {
         const response = await apiClient.post('/Users/login', { email, password });
         login(response.data.user, response.data.accessToken);
         const roleName = String(response.data.user?.role || '').toLowerCase();
-        navigate(roleName === 'sitter' ? '/walker' : '/owner', { replace: true });
+        navigate(roleName === 'support' ? '/support' : roleName === 'sitter' ? '/walker' : '/owner', { replace: true });
       }
     } catch (error) {
       const serverMessage = error.response?.data;

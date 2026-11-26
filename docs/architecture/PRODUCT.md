@@ -34,7 +34,7 @@ flowchart LR
 2. A sitter filters available orders, opens the details, and applies.
 3. The owner reviews applications and assigns one sitter. The exact address is revealed only to the owner and assigned sitter.
 4. The sitter starts and completes the service and submits a short report.
-5. Either account can open **Support** and contact a manager. A support conversation can be linked to an order for context.
+5. Either account can open **Support** and contact a manager. A support conversation can be linked only to an order that account owns or is assigned to.
 
 Order status and payment status remain separate. Payments, live map tracking, real geocoding, and customer-to-sitter messaging are later integrations or milestones; they must not be shown as working until implemented.
 
@@ -45,8 +45,8 @@ Support chat is a first-class workspace for both owners and sitters on web and d
 - A signed-in user can start a private conversation, choose a topic, and optionally attach an order reference.
 - The conversation has a queue/assignment state and an open, waiting, or resolved status.
 - Only the requester and authorized support staff can read or write messages. The API checks this for every request.
-- Staff permissions are internal and audited. User-supplied role fields never grant support access.
-- Start with text and timestamps; add safe image/file attachments only after storage limits, access checks, and retention rules are defined.
+- Staff permissions are internal and user-supplied registration fields never grant support access. Assignment and status changes are not yet written to a dedicated audit log.
+- The current version supports text and timestamps with polling. File attachments and read receipts need storage/access rules and retention before implementation.
 - Keep support conversations separate from service conversations between an owner and a sitter.
 
 ## Repository boundaries

@@ -3,6 +3,7 @@ import { useAuth } from './api/context/AuthContext';
 import Login from './pages/Login';
 import OwnerDashboard from './pages/OwnerDashboard';
 import WalkerDashboard from './pages/WalkerDashboard';
+import SupportDashboard from './pages/SupportDashboard';
 
 function normalizedRole(role) {
   const value = String(role || '').toLowerCase();
@@ -42,9 +43,17 @@ export default function App() {
         )}
       />
       <Route
+        path="/support"
+        element={(
+          <RequireAuth allowedRoles={['support']}>
+            <SupportDashboard />
+          </RequireAuth>
+        )}
+      />
+      <Route
         path="/"
         element={user
-          ? <Navigate to={role === 'sitter' ? '/walker' : '/owner'} replace />
+          ? <Navigate to={role === 'support' ? '/support' : role === 'sitter' ? '/walker' : '/owner'} replace />
           : <Navigate to="/login" replace />}
       />
       <Route path="*" element={<Navigate to="/" replace />} />

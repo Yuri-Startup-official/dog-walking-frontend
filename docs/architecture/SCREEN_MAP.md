@@ -9,7 +9,8 @@
 | `/login` | Sign in | Connected to the API |
 | `/register` | Registration | Connected to the API; email verification is pending |
 | `/owner` | Owner workspace | Connected order and dog flows; map is illustrative |
-| `/walker` | Sitter workspace | Connected available orders, applications, and assigned work |
+| `/walker` | Sitter workspace | Connected available orders, applications, assigned work, and support |
+| `/support` | Internal support workspace | Protected by the internal support role |
 
 The Windows desktop shell will open the same React routes. It does not introduce a second set of business screens.
 
@@ -21,7 +22,7 @@ The Windows desktop shell will open the same React routes. It does not introduce
 | **My orders** | Follow order status, applications, assignment, and reports | Core flow connected |
 | **My dogs** | Add and view dog-care information | Basic flow connected |
 | **Messages** | Service conversation with an assigned sitter | Placeholder/future API work |
-| **Support** | Private chat with a service manager; optional order reference | Required next product feature |
+| **Support** | Private chat with a service manager; optional owned/assigned order reference | Text chat connected; polls for updates |
 | **Profile** | Account details and security settings | Basic placeholder |
 | **Payments** | Charges and refunds | Add after provider integration |
 
@@ -34,7 +35,7 @@ The Windows desktop shell will open the same React routes. It does not introduce
 | **Availability** | Work schedule and unavailable time | Placeholder/future API work |
 | **Services and areas** | Service types, districts, and working radius | Placeholder/future API work |
 | **Messages** | Service conversation with an owner | Placeholder/future API work |
-| **Support** | Private chat with a service manager; optional order reference | Required next product feature |
+| **Support** | Private chat with a service manager; optional owned/assigned order reference | Text chat connected; polls for updates |
 | **Profile** | Experience, contact verification, and security | Basic placeholder |
 | **Payouts** | Earnings and payout history | Add after provider integration |
 
@@ -43,10 +44,10 @@ The Windows desktop shell will open the same React routes. It does not introduce
 ```text
 Workspace → Support → New conversation → Topic + optional order → Message
                                                    ↓
-                          Manager queue → Assigned → Reply → Resolved
+                          Staff queue → Claim → Reply → Resolve/reopen
 ```
 
-Users see only their own conversations. Authorized staff see conversations allowed by their support permissions. Attachments, if added later, use private storage and short-lived access links.
+Users see only their own conversations. Support staff see unassigned conversations and conversations assigned to themselves. File attachments and read receipts are not implemented.
 
 ## Public website pages
 

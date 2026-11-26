@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../api/context/AuthContext';
+import SupportCenter from './SupportCenter';
 import '../App.css';
 
 function toViewOrder(order) {
@@ -49,14 +50,15 @@ function toViewOrder(order) {
     rawStatus: rawStatuses[String(order.status).toLowerCase()] || order.status,
     applicationCount: order.applicationCount || 0,
     applicationStatus: order.applicationStatus,
+    canAttachToSupport: order.canContactSupport === true,
   };
 }
 
 const ownerNav = [
-  ['map', 'Карта', 'map'], ['orders', 'Мои заказы', 'calendar'], ['dogs', 'Мои собаки', 'paw'], ['messages', 'Сообщения', 'chat'], ['profile', 'Профиль', 'user'],
+  ['map', 'Карта', 'map'], ['orders', 'Мои заказы', 'calendar'], ['dogs', 'Мои собаки', 'paw'], ['messages', 'Сообщения', 'chat'], ['support', 'Поддержка', 'chat'], ['profile', 'Профиль', 'user'],
 ];
 const walkerNav = [
-  ['map', 'Карта заказов', 'map'], ['orders', 'Мои заказы', 'calendar'], ['availability', 'Доступность', 'clock'], ['services', 'Услуги и районы', 'sliders'], ['messages', 'Сообщения', 'chat'], ['profile', 'Профиль', 'user'],
+  ['map', 'Карта заказов', 'map'], ['orders', 'Мои заказы', 'calendar'], ['availability', 'Доступность', 'clock'], ['services', 'Услуги и районы', 'sliders'], ['messages', 'Сообщения', 'chat'], ['support', 'Поддержка', 'chat'], ['profile', 'Профиль', 'user'],
 ];
 
 function Icon({ name, size = 19 }) {
@@ -448,7 +450,7 @@ function Dashboard({ dashboardRole }) {
         <a className="brand" href="#home" onClick={(event) => { event.preventDefault(); setTab('map'); }}><span className="brand-mark"><Icon name="paw" size={22} /></span><span>dogwalking<small>ЗАБОТА РЯДОМ</small></span></a>
         <div className="sidebar-label">МЕНЮ</div>
         <nav className="side-nav" aria-label="Главная навигация">{nav.map(([id, label, icon]) => <button key={id} className={tab === id ? 'nav-item active' : 'nav-item'} onClick={() => setTab(id)}><Icon name={icon} /><span>{label}</span>{id === 'messages' && <i className="nav-badge">2</i>}</button>)}</nav>
-        <div className="sidebar-bottom"><div className="support-card"><div className="support-icon"><Icon name="heart" size={17} /></div><strong>Мы рядом</strong><p>Нужна помощь с заказом?</p><button onClick={() => flash('Раздел поддержки будет подключён следующим этапом.')}>Написать в поддержку <Icon name="arrow" size={14} /></button></div><button className="nav-item logout-item" onClick={() => { logout(); navigate('/login', { replace: true }); }}><Icon name="logout" /><span>Выйти</span></button></div>
+        <div className="sidebar-bottom"><div className="support-card"><div className="support-icon"><Icon name="heart" size={17} /></div><strong>Мы рядом</strong><p>Нужна помощь с заказом?</p><button onClick={() => setTab('support')}>Написать в поддержку <Icon name="arrow" size={14} /></button></div><button className="nav-item logout-item" onClick={() => { logout(); navigate('/login', { replace: true }); }}><Icon name="logout" /><span>Выйти</span></button></div>
       </aside>
       <main className="main-area">
         <header className="topbar"><div className="breadcrumbs"><span>Рабочее пространство</span><span>/</span><strong>{nav.find(([id]) => id === tab)?.[1] || 'Карта'}</strong></div><div className="topbar-right"><button className="city-button"><Icon name="pin" size={16} /> Москва <span>⌄</span></button><button className="notification-button" aria-label="Уведомления" onClick={() => flash('Новых уведомлений пока нет.')}><Icon name="bell" size={19} /><i /></button><div className="user-chip"><div className="mini-avatar">{user.name?.[0] || 'A'}</div><div><strong>{user.name || 'Пользователь'}</strong><span>{role === 'owner' ? 'Владелец' : 'Исполнитель'}</span></div><span className="chevron">⌄</span></div></div></header>
@@ -458,7 +460,8 @@ function Dashboard({ dashboardRole }) {
           {tab === 'map' && <MapPage role={role} orders={liveOrders} selectedId={selectedId} onSelect={setSelectedId} onCreate={() => setShowModal(true)} onRespond={handleRespond} onReview={handleReviewApplications} />}
           {tab === 'orders' && <ConnectedOrdersPage role={role} orders={myOrders} onCreate={() => setShowModal(true)} onReview={handleReviewApplications} onStart={handleStartOrder} onComplete={handleCompleteOrder} />}
           {tab === 'dogs' && role === 'owner' && <ConnectedDogsPage dogs={dogs} onAdd={() => setShowDogModal(true)} />}
-          {tab !== 'map' && tab !== 'orders' && tab !== 'dogs' && <SimplePage tab={tab} role={role} />}
+          {tab === 'support' && <SupportCenter orders={myOrders.filter((order) => order.canAttachToSupport)} />}
+          {tab !== 'map' && tab !== 'orders' && tab !== 'dogs' && tab !== 'support' && <SimplePage tab={tab} role={role} />}
         </div>
       </main>
       {showModal && <CreateOrderModal onClose={() => setShowModal(false)} onCreate={handleCreateOrder} onAddDog={() => { setTab('dogs'); setShowDogModal(true); }} dogs={dogs} />}
