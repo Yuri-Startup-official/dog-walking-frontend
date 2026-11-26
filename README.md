@@ -1,16 +1,41 @@
-# React + Vite
+# DogWalking web and desktop client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Shared React/Vite workspace for the public website and owner/sitter accounts. The first desktop release targets Windows and packages this UI in a secure Electron shell. Both clients use the ASP.NET API; the desktop installer does not contain a database or API secret.
 
-Currently, two official plugins are available:
+## Project layout
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```text
+src/
+  api/                  HTTP client and authentication state
+  pages/                Sign-in and owner/sitter workspaces
+  assets/               Bundled images
+desktop/
+  assets/               Shared SVG brand mark and Windows icon
+  electron/             Windows desktop main process and app protocol
+  scripts/              Desktop development launcher
+docs/
+  architecture/         Product architecture and screen map
+  development/          Windows desktop build guide
+public/                 Static web assets
+```
 
-## React Compiler
+Generated files are separated from source: `dist/` contains the Vite build and `release/windows/` contains unpacked apps and Windows installers; both are ignored by Git.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Commands
 
-## Expanding the ESLint configuration
+```powershell
+npm install
+npm run desktop:prepare
+npm run dev
+npm run desktop:dev
+npm run lint
+npm run build
+npm run desktop:build:dir
+npm run desktop:build
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For Windows desktop setup and API configuration, see [the desktop guide](docs/development/WINDOWS_DESKTOP.md). The current screen state is documented in [the screen map](docs/architecture/SCREEN_MAP.md); intended product boundaries are in [the architecture overview](docs/architecture/PRODUCT.md).
+
+## Current scope
+
+Sign-in, registration, pet profiles, order creation, applications, assignment, and service status changes are connected to the API. The map is still illustrative. Manager support chat, real map/geocoding, email verification, payments, and production hosting remain planned work; the screen map marks implemented and planned areas separately.

@@ -1,13 +1,20 @@
 {
   "name": "dog-walking-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "DogWalking web and Windows desktop client",
+  "author": "DogWalking",
   "type": "module",
+  "main": "desktop/electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "desktop:prepare": "install-electron --no",
+    "desktop:dev": "node desktop/scripts/start-dev.mjs",
+    "desktop:build:dir": "vite build --base=./ && electron-builder --dir --win --x64",
+    "desktop:build": "vite build --base=./ && electron-builder --win nsis --x64"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.108.4",
@@ -22,11 +29,45 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^45.5.0",
+    "electron-builder": "^26.18.0",
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.6"
+  },
+  "build": {
+    "appId": "com.dogwalking.app",
+    "productName": "DogWalking",
+    "asar": true,
+    "directories": {
+      "output": "release/windows"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/assets/**/*",
+      "desktop/electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "desktop/assets/dogwalking.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }
