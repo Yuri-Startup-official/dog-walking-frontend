@@ -1,61 +1,77 @@
-# Screen map: web and Windows desktop
+# Screen map: website, Windows desktop, and later mobile
 
-**Status:** current UI and planned workspace are identified separately.
+**Status:** proposed navigation baseline. Current implementation is marked separately from planned screens.
 
-## Current routes
+The first desktop release serves both owners and service providers. The website is planned to contain public information pages and the same authenticated workspace. Mobile comes after the shared API and core workflows stabilize.
 
-| Route | Screen | State |
+## Public website
+
+| Page | Purpose | State |
 | --- | --- | --- |
-| `/login` | Sign in | Connected to the API |
-| `/register` | Registration | Connected to the API; email verification is pending |
-| `/owner` | Owner workspace | Connected order and dog flows; map is illustrative |
-| `/walker` | Sitter workspace | Connected available orders, applications, assigned work, and support |
-| `/support` | Internal support workspace | Protected by the internal support role |
+| Home | Explain the service and route owners/providers to the right start | Planned |
+| How it works | Separate steps for ordering and providing care | Planned |
+| Walking and boarding | Explain service scope and requirements | Planned |
+| Become a provider | Explain profile, verification, application, and service rules | Planned |
+| Safety and trust | Explain account checks, address privacy, payments, support, and incident reporting | Planned |
+| Help and FAQ | Self-service answers and link to sign in for private support | Planned |
+| Terms and privacy | Legal documents for the selected launch market | Planned |
+| Sign in / Register | Secure access to the workspace | API connected; verification flow pending |
 
-The Windows desktop shell will open the same React routes. It does not introduce a second set of business screens.
+Use `/help` or `/contact` for public help pages. Keep `/support` for the internal staff workspace unless route naming is deliberately changed.
 
-## Owner navigation
+## Owner workspace
 
-| Section | Purpose | State |
+| Tab | Purpose | State |
 | --- | --- | --- |
-| **Map** | View own orders and create a walking or boarding order | Basic screen; real map/geocoding pending |
-| **My orders** | Follow order status, applications, assignment, and reports | Core flow connected |
-| **My dogs** | Add and view dog-care information | Basic flow connected |
-| **Messages** | Service conversation with an assigned sitter | Placeholder/future API work |
-| **Support** | Private chat with a service manager; optional owned/assigned order reference | Text chat connected; polls for updates |
-| **Profile** | Account details and security settings | Basic placeholder |
-| **Payments** | Charges and refunds | Add after provider integration |
+| **Map / Find care** | Create requests and follow their location/status; provider discovery can be added if needed | Current map is illustrative; real geocoding planned |
+| **My orders** | Draft, publish, review applications, follow service status and reports | Core create/apply/assign/complete flow connected |
+| **My dogs** | Maintain care, behavior, and medical notes | Basic profile flow connected |
+| **Messages** | Private conversation with the assigned provider, tied to an order | Planned |
+| **Support** | Private conversation with a manager; link an owned order if useful | Text chat connected; polling updates |
+| **Payments** | Charges, receipts, refunds, and payment methods | Planned after provider/rules decision |
+| **Profile and security** | Contact details, verification, password, and sessions | Basic placeholder; hardening planned |
 
-## Sitter navigation
+## Service provider workspace
 
-| Section | Purpose | State |
+| Tab | Purpose | State |
 | --- | --- | --- |
-| **Order map** | Find open walking and boarding orders | Current map is illustrative; real map/geocoding pending |
-| **My orders** | Applications, assigned, in-progress, and completed work | Core flow connected |
-| **Availability** | Work schedule and unavailable time | Placeholder/future API work |
-| **Services and areas** | Service types, districts, and working radius | Placeholder/future API work |
-| **Messages** | Service conversation with an owner | Placeholder/future API work |
-| **Support** | Private chat with a service manager; optional owned/assigned order reference | Text chat connected; polls for updates |
-| **Profile** | Experience, contact verification, and security | Basic placeholder |
-| **Payouts** | Earnings and payout history | Add after provider integration |
+| **Order map** | Find available walking and boarding requests by area/time | Current map is illustrative; real search/geocoding planned |
+| **My work** | Applications, assigned/upcoming, active, and completed orders | Core application and service lifecycle connected |
+| **Availability** | Set working days, hours, and unavailable times | Planned |
+| **Services and areas** | Select walking/boarding, define service area and rates | Planned |
+| **Messages** | Private conversation with the owner for an assigned order | Planned |
+| **Support** | Private conversation with a manager; link an assigned order if useful | Text chat connected; polling updates |
+| **Earnings and payouts** | View payment settlement and payout history | Planned after payment rules/provider decision |
+| **Profile and verification** | Experience, service details, contact and identity checks | Basic placeholder; verification policy pending |
 
-## Support chat flow
+If an account can act as both owner and provider, show a visible workspace switcher. That behavior still needs product confirmation.
+
+## Support staff workspace
+
+| Screen | Purpose | State |
+| --- | --- | --- |
+| Queue | List unassigned conversations and those assigned to the current staff member | Connected |
+| Conversation | Read and send text messages; view optional order reference | Connected |
+| Assignment and status | Claim, resolve, and reopen conversations | Connected |
+| Staff administration and audit | Provision staff, define permissions, review sensitive actions | Planned |
+
+Staff access is internal. Public account registration must never create a support account.
+
+## Main service flow
 
 ```text
-Workspace → Support → New conversation → Topic + optional order → Message
-                                                   ↓
-                          Staff queue → Claim → Reply → Resolve/reopen
+Owner: register → add dog → publish walking/boarding request
+Provider: profile → find request → apply
+Owner: compare applications → assign provider → pay [payment integration later]
+Provider: perform service → send completion report
+Both: order-linked conversation [planned] or separate manager support chat [connected]
+Platform: confirm payment/refund/payout [provider and business rules pending]
 ```
 
-Users see only their own conversations. Support staff see unassigned conversations and conversations assigned to themselves. File attachments and read receipts are not implemented.
+## Navigation and interaction rules
 
-## Public website pages
-
-Plan these as public routes that link into `/login` and `/register`:
-
-- Home and how the service works.
-- Dog walking and boarding information.
-- For sitters: joining, profile requirements, and service rules.
-- Safety, FAQ, terms, privacy, and support contact.
-
-These marketing pages are not part of the current authenticated workspace.
+- Use separate sections for service messages and manager support. Do not merge these histories.
+- Keep the order's precise address hidden until the owner/provider relationship is established.
+- Let the server decide whether a user can see an order, message, address, or payment.
+- Show payment actions only when the API confirms the payment state and allowed action.
+- Mobile should reuse these journeys, but may use native navigation patterns after its framework is selected.

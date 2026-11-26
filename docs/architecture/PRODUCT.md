@@ -1,6 +1,6 @@
 # Product and application architecture
 
-**Status:** working architecture for the first Windows desktop and web release. Mobile follows on the same API.
+**Status:** product baseline. See [system architecture](SYSTEM_ARCHITECTURE.md), [screen map](SCREEN_MAP.md), [data model](DATA_MODEL.md), and [open decisions](DECISIONS.md). Mobile follows on the same API.
 
 ## Product surfaces
 
@@ -100,3 +100,5 @@ docs/development/       Local setup and migration steps
 - Payment provider, fees, refunds, and payout rules.
 - Email verification and password recovery workflow.
 - Support staffing hours, response targets, and conversation retention.
+- Whether one account can switch between owner and provider workspaces.
+- Provider verification requirements and account recovery policy.
