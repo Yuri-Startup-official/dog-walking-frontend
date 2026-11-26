@@ -44,7 +44,7 @@ Use `/help` or `/contact` for public help pages. Keep `/support` for the interna
 | **Earnings and payouts** | View payment settlement and payout history | Planned after payment rules/provider decision |
 | **Profile and verification** | Experience, service details, contact and identity checks | Basic placeholder; verification policy pending |
 
-If an account can act as both owner and provider, show a visible workspace switcher. That behavior still needs product confirmation.
+For a `Both` account, show a visible owner/provider workspace switcher. Keep the last selected workspace for the next sign-in; default new accounts to the owner workspace. The API still gates provider actions by provider profile state.
 
 ## Support staff workspace
 

@@ -7,6 +7,7 @@
 ```mermaid
 erDiagram
   USER ||--o{ PET : owns
+  USER ||--o| PROVIDER_PROFILE : has
   USER ||--o{ ORDER : creates
   USER o|--o{ ORDER : "assigned provider"
   PET ||--o{ ORDER : "is booked for"
@@ -37,15 +38,19 @@ The diagram shows the intended domain, not a promise that every table exists tod
 
 | Domain | Current | Target additions |
 | --- | --- | --- |
-| Identity | `User` | Revocable `Session`, email/phone `Verification`, recovery records, staff permissions |
+| Identity | `User` | Revocable `Session`, email/phone `Verification`, recovery records, staff permissions, one-to-one `ProviderProfile` and verification state |
 | Pet care | `Pet` | Private vaccine/identity document metadata only if product policy requires it |
-| Marketplace | `Order`, `WalkingOrder`, `BoardingOrder`, `OrderApplication` | Provider profile, services, service area, availability, cancellation/dispute history |
+| Marketplace | `Order`, `WalkingOrder`, `BoardingOrder`, `OrderApplication` | Provider services, service area, availability, cancellation/dispute history |
 | Conversations | `SupportConversation`, `SupportMessage` | Order-linked owner/provider `Conversation`, `ConversationMember`, `Message`, read state, staff audit events |
 | Payments | Price and preliminary payment fields on `Order` | Separate `Payment`, `Refund`, `Payout`, `PayoutItem`, and provider webhook/event records |
 | Trust | Ratings are currently fields on `User` | Per-order `Review`, moderation/report events, verification state |
 | Notifications | None | `Notification` and delivery attempts, separate from source order/message state |
 
 ## Lifecycle rules
+
+### Account and provider profile
+
+One `User` identity may have owner and provider capabilities. The active workspace is a client navigation preference; every API action is checked against server-side capabilities. Keep provider verification/approval in a separate `ProviderProfile` state so choosing the provider workspace never bypasses onboarding requirements.
 
 ### Order
 

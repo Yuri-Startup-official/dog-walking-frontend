@@ -37,7 +37,13 @@ flowchart LR
 
 The API is the only component allowed to access PostgreSQL or provider secrets. Start with a **modular monolith**, not microservices: one API deployment and database, with clear domain boundaries inside the codebase.
 
-## 3. Backend domain modules
+## 3. Account and workspace model
+
+One `User` identity may use the owner workspace, the provider workspace, or both. A `Both` account gets a visible workspace switcher; the selected workspace is navigation state, not an authorization grant. Default a new account to the owner workspace and remember the last selected workspace.
+
+Keep provider onboarding and verification in a separate `ProviderProfile` with an explicit state. A user may open the provider workspace and complete onboarding, but provider actions such as applying to or performing paid work must be gated by server-side verification/approval rules. The exact checks and review process remain open decisions.
+
+## 4. Backend domain modules
 
 | Module | Responsibility | Main data |
 | --- | --- | --- |
@@ -54,14 +60,14 @@ The API is the only component allowed to access PostgreSQL or provider secrets. 
 
 Each module owns its validation and use cases. Controllers translate HTTP requests into those use cases; DTOs define the public API contract. A module must not return EF entities directly.
 
-## 4. Client boundaries
+## 5. Client boundaries
 
 - React owns navigation and presentation. It can hide unavailable actions for clarity, but it never authorizes access.
 - Electron packages the same renderer and keeps Node.js APIs out of the renderer. Desktop-only code stays under `desktop/electron/`.
 - A future mobile client reuses API contracts and business rules; it does not connect to the database.
 - The public site and authenticated workspace may share frontend build assets, but public pages do not receive authenticated customer data.
 
-## 5. Trust and security boundaries
+## 6. Trust and security boundaries
 
 - All deployed API traffic uses HTTPS. API authorization derives user identity and role from a validated server-issued token.
 - Public registration can create only customer/provider roles. Support and operations permissions require a controlled staff provisioning process.
@@ -72,7 +78,7 @@ Each module owns its validation and use cases. Controllers translate HTTP reques
 - Private documents or message attachments require private storage, explicit access checks, file type/size limits, retention rules, and malware scanning before release.
 - Staff actions that access customer data should produce an audit record.
 
-## 6. Source organization target
+## 7. Source organization target
 
 Keep the API and frontend as separate repositories. Organize future additions by feature and keep infrastructure/shared code explicit. The current implementation is small; refactor folders only after the boundaries are approved.
 
@@ -129,7 +135,7 @@ infra/local/
 
 This is a target layout, not a requirement to move the existing files now. Preserve the current build and database migration history while any refactor is done.
 
-## 7. Build sequence
+## 8. Build sequence
 
 1. Confirm the decisions in [DECISIONS.md](DECISIONS.md).
 2. Approve role-specific navigation and the public website scope in [SCREEN_MAP.md](SCREEN_MAP.md).
@@ -139,6 +145,6 @@ This is a target layout, not a requirement to move the existing files now. Prese
 6. Add production map and payment providers after launch market and operational rules are decided.
 7. Harden the Windows release; plan the mobile client only after shared API contracts stabilize.
 
-## 8. Current versus planned
+## 9. Current versus planned
 
 Current code includes sign-in/registration, owner and provider order flows, pet profiles, the Windows Electron shell, and text-based support chat. Real geocoding, provider/customer service chat, email/phone verification, production session management, payment processing, payouts, public marketing pages, and a full staff administration console remain future work.

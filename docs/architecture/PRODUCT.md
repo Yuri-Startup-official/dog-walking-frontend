@@ -25,7 +25,7 @@ flowchart LR
 
 - **Owner:** maintains dog profiles and creates walking or boarding orders.
 - **Sitter:** sets services and availability, finds orders, applies, and completes assigned work.
-- **Both:** can use both workspaces from one account.
+- **Both:** uses one account to switch between owner and provider workspaces; provider actions still depend on provider profile state.
 - **Support manager:** an internal staff permission, assigned by an administrator. Public registration cannot grant staff access.
 
 ## Main flows
@@ -36,7 +36,7 @@ flowchart LR
 4. The sitter starts and completes the service and submits a short report.
 5. Either account can open **Support** and contact a manager. A support conversation can be linked only to an order that account owns or is assigned to.
 
-Order status and payment status remain separate. Payments, live map tracking, real geocoding, and customer-to-sitter messaging are later integrations or milestones; they must not be shown as working until implemented.
+Order status and payment status remain separate. Payments, live map tracking, real geocoding, provider profiles/verification, and customer-to-sitter messaging are later integrations or milestones; they must not be shown as working until implemented.
 
 ## Manager support chat
 
@@ -100,5 +100,4 @@ docs/development/       Local setup and migration steps
 - Payment provider, fees, refunds, and payout rules.
 - Email verification and password recovery workflow.
 - Support staffing hours, response targets, and conversation retention.
-- Whether one account can switch between owner and provider workspaces.
 - Provider verification requirements and account recovery policy.
